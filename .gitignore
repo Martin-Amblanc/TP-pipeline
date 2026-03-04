@@ -1,0 +1,10 @@
+# Ignorer l'environnement virtuel
+Env/
+
+# Ignorer le fichier contenant les mots de passe et variables
+.env
+
+# Ignorer les fichiers de cache Python (qui se créent tout seuls)
+__pycache__/
+*.pyc
+*.pyo
