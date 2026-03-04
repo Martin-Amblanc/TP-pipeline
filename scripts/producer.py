@@ -8,23 +8,23 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # 2. Configuration
-API_URL = os.getenv("API_URL", "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records?limit=20")
+API_URL = os.getenv("API_URL", "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojsons")
 # On utilise localhost car on lance le script depuis ton ordinateur (l'hôte)
 KAFKA_BROKER = "localhost:9092" 
-KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "velib-stations")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "earthquakes")
 
-def fetch_velib_data():
-    """Récupère les données depuis l'API Open Data Paris."""
+def fetch_data():
+    """Récupère les données des séismes depuis l'API de l'USGS."""
     print(f"Interrogation de l'API: {API_URL}")
     response = requests.get(API_URL)
     
     if response.status_code == 200:
-        data = response.json().get('results', [])
-        return data
+        data = response.json()
+        # L'USGS stocke la liste des séismes dans la clé 'features'
+        return data.get('features', []) 
     else:
         print(f"Erreur lors de l'appel API. Code de statut: {response.status_code}")
         return []
-
 def main():
     """Fonction principale pour ingérer les données dans Kafka."""
     print(f"Connexion au broker Kafka sur {KAFKA_BROKER}...")
@@ -36,7 +36,7 @@ def main():
     )
     
     # Récupération des données
-    stations = fetch_velib_data()
+    stations = fetch_data()
     
     if not stations:
         print("Aucune donnée à envoyer.")
