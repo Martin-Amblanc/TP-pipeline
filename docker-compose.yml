@@ -54,6 +54,24 @@ services:
     networks:
       - bigdata
 
+    # -------------------------------------
+  # OBJECT STORAGE : MINIO (S3 Compatible)
+  # -------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: minio_pipeline
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin1234
+    ports:
+      - "9005:9000" # API : mappé sur 9005 car le 9000 est pris par HDFS
+      - "9002:9001" # Console Web (Interface graphique)
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - bigdata
+
   # -------------------------------------
   # MESSAGE BROKER : KAFKA (KRaft mode)
   # -------------------------------------
@@ -148,6 +166,7 @@ services:
 # -------------------------------------
 volumes:
   grafana_data:
+  minio_data:
 
 networks:
   bigdata:
